@@ -4,15 +4,17 @@ from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import filters
+from rest_framework.authtoken.views import ObtainAuthToken #login
+from rest_framework.settings import api_settings #login
 
-from profiles_api import serializes
+from profiles_api import serializer
 from profiles_api import models
 from profiles_api import permissions
 # Create your views here.
 class HelloApiView(APIView):
 
   """Test API View"""
-  serializer_class= serializes.HelloSerializer
+  serializer_class= serializer.HelloSerializer
   def get(self, request, format=None):
     """Returns a list of APIView features"""
     an_apiview=[
@@ -50,7 +52,7 @@ class HelloApiView(APIView):
 
 class HelloViewSet(viewsets.ViewSet):
   """ Test API ViewSet """
-  serialier_class= serializes.HelloSerializer
+  serialier_class= serializer.HelloSerializer
 
   def list(self, request):
     """Return hello message"""
@@ -92,10 +94,14 @@ class HelloViewSet(viewsets.ViewSet):
 
 class UserProfileViewSet(viewsets.ModelViewSet):
   """Handle creating and updating profiles"""
-  serializer_class = serializes.UserProfileSerializer
+  serializer_class = serializer.UserProfileSerializer
   queryset = models.UserProfile.objects.all()
   authentication_classes = (TokenAuthentication,)
   permission_classes = (permissions.UpdateOwnProfile,)
   filter_backends=(filters.SearchFilter,)
   search_fields=('name','email',)
+
+class UserLoginApiView(ObtainAuthToken):
+  """Handle creating user autehntication tokens"""
+  renderer_classes = api_settings.DEFAULT_RENDERER_CLASSES
 
